@@ -116,6 +116,7 @@ provider "airflow" {
 - `oauth2_token` - (Optional) An OAUTH2 identity token used to authenticate against an Airflow server. **Conflicts with username and password**
 - `username` - (Optional) The username to use for API basic authentication. **Conflicts with oauth2_token**
 - `password` - (Optional) The password to use for API basic authentication. **Conflicts with oauth2_token**
+- `disable_ssl_verification` - (Optional) Disable SSL verification. Default is `false`
 
 ## Running Acceptence Tests
 

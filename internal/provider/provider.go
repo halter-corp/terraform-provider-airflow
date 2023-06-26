@@ -56,9 +56,10 @@ func AirflowProvider() *schema.Provider {
 				ConflictsWith: []string{"oauth2_token"},
 			},
 			"disable_ssl_verification": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Disable SSL verification",
+				Default:     false,
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
