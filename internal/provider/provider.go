@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -54,6 +55,11 @@ func AirflowProvider() *schema.Provider {
 				RequiredWith:  []string{"username"},
 				ConflictsWith: []string{"oauth2_token"},
 			},
+			"disable_ssl_verification": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"airflow_connection": resourceConnection(),
@@ -75,7 +81,16 @@ func AirflowProvider() *schema.Provider {
 }
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	transport := logging.NewLoggingHTTPTransport(http.DefaultTransport)
+	var transport http.RoundTripper
+
+	if disableSSl := d.Get("disable_ssl_verification").(bool); disableSSl {
+		transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		transport = logging.NewLoggingHTTPTransport(http.DefaultTransport)
+	}
+
 	client := &http.Client{
 		Transport: transport,
 	}
