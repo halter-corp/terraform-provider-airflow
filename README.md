@@ -54,7 +54,7 @@ data "google_service_account_id_token" "oidc" {
   target_service_account = google_service_account.example.email
   delegates              = []
   include_email          = true
-  target_audience        = regex("[A-Za-z0-9-]*\\.apps\\.googleusercontent\\.com", data.http.client_id.body)
+  target_audience        = regex("[A-Za-z0-9-]*\\.apps\\.googleusercontent\\.com", data.http.client_id.response_body)
 }
 
 provider "airflow" {
