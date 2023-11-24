@@ -174,22 +174,32 @@ func resourceConnectionUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 	if v, ok := d.GetOk("host"); ok {
 		conn.SetHost(v.(string))
+	} else {
+		conn.SetHostNil()
 	}
 
 	if v, ok := d.GetOk("description"); ok {
 		conn.SetDescription(v.(string))
+	} else {
+		conn.SetDescriptionNil()
 	}
 
 	if v, ok := d.GetOk("login"); ok {
 		conn.SetLogin(v.(string))
+	} else {
+		conn.SetLoginNil()
 	}
 
 	if v, ok := d.GetOk("schema"); ok {
 		conn.SetSchema(v.(string))
+	} else {
+		conn.SetSchemaNil()
 	}
 
 	if v, ok := d.GetOk("port"); ok {
 		conn.SetPort(int32(v.(int)))
+	} else {
+		conn.SetPortNil()
 	}
 
 	if v, ok := d.GetOk("password"); ok && v.(string) != "" {
@@ -198,6 +208,8 @@ func resourceConnectionUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 	if v, ok := d.GetOk("extra"); ok {
 		conn.SetExtra(v.(string))
+	} else {
+		conn.SetExtraNil()
 	}
 
 	_, _, err := client.ConnectionApi.PatchConnection(pcfg.AuthContext, connId).Connection(conn).Execute()
