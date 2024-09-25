@@ -61,6 +61,13 @@ func AirflowProvider() *schema.Provider {
 				Description: "Disable SSL verification",
 				Default:     false,
 			},
+			"x_api_key": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Description:   "The API key to use for header (X-Api-Key) authentication",
+				ConflictsWith: []string{"username", "oauth2_token"},
+				DefaultFunc:   schema.EnvDefaultFunc("AIRFLOW_X_API_KEY", nil),
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"airflow_connection": resourceConnection(),
@@ -134,6 +141,10 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 				Description: "Apache Airflow Stable API.",
 			},
 		},
+	}
+
+	if xApiKey, ok := d.GetOk("x_api_key"); ok {
+		clientConf.DefaultHeader["X-Api-Key"] = xApiKey.(string)
 	}
 
 	prov := ProviderConfig{
