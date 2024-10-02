@@ -62,11 +62,10 @@ func AirflowProvider() *schema.Provider {
 				Default:     false,
 			},
 			"x_api_key": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Description:   "The API key to use for header (X-Api-Key) authentication",
-				ConflictsWith: []string{"username", "oauth2_token"},
-				DefaultFunc:   schema.EnvDefaultFunc("AIRFLOW_X_API_KEY", nil),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The API key to use for header (X-Api-Key) authentication",
+				DefaultFunc: schema.EnvDefaultFunc("AIRFLOW_X_API_KEY", nil),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
