@@ -96,11 +96,19 @@ func resourceVariableUpdate(ctx context.Context, d *schema.ResourceData, m inter
 
 	if v, ok := d.GetOk("description"); ok {
 		variableReq.SetDescription(v.(string))
+	} else {
+		variableReq.SetDescription("")
 	}
 
 	_, resp, err := client.VariableApi.PatchVariable(pcfg.AuthContext, key).Variable(variableReq).Execute()
 	if err != nil {
-		return diag.Errorf("failed to update variable `%s`, Status: `%s` from Airflow: %s", key, resp.Status, err)
+		responseBody := make([]byte, resp.ContentLength)
+		_, err2 := resp.Body.Read(responseBody)
+		if err2 != nil {
+			return diag.Errorf("error reading response from Airflow: %s", err2)
+		}
+
+		return diag.Errorf("failed to update variable `%s`, Status: `%s` from Airflow: %s\n%s", key, resp.Status, err, string(responseBody))
 	}
 
 	return resourceVariableRead(ctx, d, m)

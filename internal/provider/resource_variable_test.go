@@ -45,6 +45,7 @@ func TestAccAirflowVariable_basic(t *testing.T) {
 func TestAccAirflowVariable_desc(t *testing.T) {
 	rName := acctest.RandomWithPrefix("tf-acc-test")
 	rNameUpdated := acctest.RandomWithPrefix("tf-acc-test")
+	rDesc := acctest.RandomWithPrefix("tf-acc-test")
 
 	resourceName := "airflow_variable.test"
 	resource.Test(t, resource.TestCase{
@@ -53,11 +54,11 @@ func TestAccAirflowVariable_desc(t *testing.T) {
 		CheckDestroy: testAccCheckAirflowVariableCheckDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAirflowVariableConfigDesc(rName, rName),
+				Config: testAccAirflowVariableConfigDesc(rName, rName, rDesc),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "key", rName),
 					resource.TestCheckResourceAttr(resourceName, "value", rName),
-					resource.TestCheckResourceAttr(resourceName, "description", rName),
+					resource.TestCheckResourceAttr(resourceName, "description", rDesc),
 				),
 			},
 			{
@@ -66,11 +67,11 @@ func TestAccAirflowVariable_desc(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccAirflowVariableConfigDesc(rName, rNameUpdated),
+				Config: testAccAirflowVariableConfigDesc(rName, rNameUpdated, rDesc),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "key", rName),
 					resource.TestCheckResourceAttr(resourceName, "value", rNameUpdated),
-					resource.TestCheckResourceAttr(resourceName, "description", rNameUpdated),
+					resource.TestCheckResourceAttr(resourceName, "description", rDesc),
 				),
 			},
 			{
@@ -78,7 +79,8 @@ func TestAccAirflowVariable_desc(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "key", rName),
 					resource.TestCheckResourceAttr(resourceName, "value", rName),
-					resource.TestCheckNoResourceAttr(resourceName, "description"),
+					// bug? Airflow API seems unhappy with trying to set description to null.
+					resource.TestCheckResourceAttr(resourceName, "description", ""),
 				),
 			},
 		},
@@ -117,12 +119,12 @@ resource "airflow_variable" "test" {
 `, rName, value)
 }
 
-func testAccAirflowVariableConfigDesc(rName, value string) string {
+func testAccAirflowVariableConfigDesc(rName, value, desc string) string {
 	return fmt.Sprintf(`
 resource "airflow_variable" "test" {
   key          = %[1]q
   value        = %[2]q
-  description  = "test"
+  description  = %[3]q
 }
-`, rName, value)
+`, rName, value, desc)
 }
