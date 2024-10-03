@@ -143,6 +143,9 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	}
 
 	if xApiKey, ok := d.GetOk("x_api_key"); ok {
+		if clientConf.DefaultHeader == nil {
+			clientConf.DefaultHeader = make(map[string]string)
+		}
 		clientConf.DefaultHeader["X-Api-Key"] = xApiKey.(string)
 	}
 

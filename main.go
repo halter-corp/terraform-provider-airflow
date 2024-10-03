@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/drfaust92/terraform-provider-airflow/internal/provider"
+	"github.com/halter/terraform-provider-airflow/internal/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
@@ -18,7 +18,7 @@ func main() {
 		ProviderFunc: func() *schema.Provider {
 			return provider.AirflowProvider()
 		},
-		ProviderAddr: "registry.terraform.io/drfaust92/airflow",
+		ProviderAddr: "registry.terraform.io/halter/airflow",
 		Debug:        debug,
 	})
 }
