@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-
 	"github.com/apache/airflow-client-go/airflow"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -55,7 +54,7 @@ func resourceVariableCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	_, res, err := varApi.PostVariables(pcfg.AuthContext).Variable(variableReq).Execute()
 	if err != nil {
-		responseBody := make([]byte, res.ContentLength)
+		responseBody := make([]byte, 4096)
 		_, err2 := res.Body.Read(responseBody)
 		if err2 != nil {
 			return diag.Errorf("error reading response from Airflow: %s", err2)
@@ -78,7 +77,7 @@ func resourceVariableRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return nil
 	}
 	if err != nil {
-		responseBody := make([]byte, resp.ContentLength)
+		responseBody := make([]byte, 4096)
 		_, err2 := resp.Body.Read(responseBody)
 		if err2 != nil {
 			return diag.Errorf("error reading response from Airflow: %s", err2)
@@ -114,7 +113,7 @@ func resourceVariableUpdate(ctx context.Context, d *schema.ResourceData, m inter
 
 	_, resp, err := client.VariableApi.PatchVariable(pcfg.AuthContext, key).Variable(variableReq).Execute()
 	if err != nil {
-		responseBody := make([]byte, resp.ContentLength)
+		responseBody := make([]byte, 4096)
 		_, err2 := resp.Body.Read(responseBody)
 		if err2 != nil {
 			return diag.Errorf("error reading response from Airflow: %s", err2)
@@ -132,7 +131,7 @@ func resourceVariableDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 	resp, err := client.VariableApi.DeleteVariable(pcfg.AuthContext, d.Id()).Execute()
 	if err != nil {
-		responseBody := make([]byte, resp.ContentLength)
+		responseBody := make([]byte, 4096)
 		_, err2 := resp.Body.Read(responseBody)
 		if err2 != nil {
 			return diag.Errorf("error reading response from Airflow: %s", err2)
