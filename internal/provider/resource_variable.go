@@ -55,7 +55,13 @@ func resourceVariableCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	_, res, err := varApi.PostVariables(pcfg.AuthContext).Variable(variableReq).Execute()
 	if err != nil {
-		return diag.Errorf("failed to create variable `%s`, Status: `%s` from Airflow: %s", key, res.Status, err)
+		responseBody := make([]byte, res.ContentLength)
+		_, err2 := res.Body.Read(responseBody)
+		if err2 != nil {
+			return diag.Errorf("error reading response from Airflow: %s", err2)
+		}
+
+		return diag.Errorf("failed to create variable `%s`, Status: `%s` from Airflow: %s\n%s", key, res.Status, err, string(responseBody))
 	}
 	d.SetId(key)
 
@@ -72,7 +78,13 @@ func resourceVariableRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get variable `%s`, Status: `%s` from Airflow: %s", d.Id(), resp.Status, err)
+		responseBody := make([]byte, resp.ContentLength)
+		_, err2 := resp.Body.Read(responseBody)
+		if err2 != nil {
+			return diag.Errorf("error reading response from Airflow: %s", err2)
+		}
+
+		return diag.Errorf("failed to get variable `%s`, Status: `%s` from Airflow: %s\n%s", d.Id(), resp.Status, err, string(responseBody))
 	}
 
 	d.Set("key", variable.Key)
@@ -120,7 +132,12 @@ func resourceVariableDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 	resp, err := client.VariableApi.DeleteVariable(pcfg.AuthContext, d.Id()).Execute()
 	if err != nil {
-		return diag.Errorf("failed to delete variable `%s`, Status: `%s` from Airflow: %s", d.Id(), resp.Status, err)
+		responseBody := make([]byte, resp.ContentLength)
+		_, err2 := resp.Body.Read(responseBody)
+		if err2 != nil {
+			return diag.Errorf("error reading response from Airflow: %s", err2)
+		}
+		return diag.Errorf("failed to delete variable `%s`, Status: `%s` from Airflow: %s\n%s", d.Id(), resp.Status, err, string(responseBody))
 	}
 
 	if resp != nil && resp.StatusCode == 404 {
